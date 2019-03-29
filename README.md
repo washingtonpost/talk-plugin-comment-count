@@ -64,6 +64,8 @@ Note that these parameters are required to be URI encoded, you can utilize the
 [`encodeURIComponent`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/encodeURIComponent)
 method to encode each parameter.
 
+There is also a separate route you can use to get a json response with the comment count. `/static/embed/count`. Takes the same params except for selector.
+
 #### Examples
 
 Get the comment count for a specific Asset by ID:
