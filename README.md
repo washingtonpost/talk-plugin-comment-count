@@ -31,7 +31,7 @@ Modify/create your `plugins.json` file to include the plugin:
 {
   "server": [
     // ...
-    {"@washingtonpost/talk-plugin-comment-count": "^0.0.2-beta"},
+    {"@washingtonpost/talk-plugin-comment-count": "^0.0.3-beta"},
     // ...
   ],
   "client": [
