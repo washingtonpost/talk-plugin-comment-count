@@ -32,6 +32,14 @@ function addHeaders(res: Response, expiry: number) {
   res.setHeader("Content-Type", "text/javascript");
 }
 
+function formattedCommentCount(count: number) {
+  let shortCount;
+  if (count >= 1000) {
+    shortCount = `${(Math.floor(10 * (count / 1000)) / 10).toFixed(1)}k`;
+  }
+  return shortCount
+};
+
 const cacheHandler: RequestHandler = async (req: TalkRequest, res) => {
   // Extract the Asset URL/ID from the query params.
   const {
@@ -88,6 +96,9 @@ const cacheHandler: RequestHandler = async (req: TalkRequest, res) => {
     // exist.
   }
 
+  // Format comment count per WaPo guidelines
+  commentCount = formattedCommentCount(commentCount);
+
   // Grab the translation framework out of the request.
   const translate = res.locals.t;
 
@@ -115,6 +126,82 @@ const cacheHandler: RequestHandler = async (req: TalkRequest, res) => {
   );
 };
 
+function addJsonHeaders(res: Response, expiry: number) {
+  res.setHeader("Cache-Control", `public, max-age=${expiry}`);
+  res.setHeader("Content-Type", "application/json");
+}
+
+const cacheJsonHandler: RequestHandler = async (req: TalkRequest, res) => {
+  // Extract the Asset URL/ID from the query params.
+  const {
+    id,
+    url,
+  }: Record<string, string | undefined> = req.query;
+
+  // Extract the disableCommentText parameter.
+  const disableCommentText: boolean = typeof req.query.notext !== "undefined";
+
+  // If the URl and the ID aren't provided, we need to send back an error
+  if (!url && !id) {
+    // Send back the headers.
+    addJsonHeaders(res, config.DETECT_CACHE_DURATION);
+
+    // Send error message because we need for json response
+    return res.json({
+      error: "You need to pass a url or id as a query parameter."
+    });
+    
+  }
+
+  // Try to load the comments.
+  let commentCount = 0;
+  try {
+    // Grab a reference to the graph context, and create a new fresh Context to
+    // utilize the loaders.
+    const graph = req.context.connectors.graph;
+    const ctx = graph.Context.forSystem();
+
+    if (id) {
+      // Load the comment counts via the asset ID that was passed.
+      commentCount = await ctx.loaders.Comments.countByAssetID.load(id);
+    } else {
+      // Load the asset via the URL passed.
+      let asset = await ctx.loaders.Assets.findByUrl(url!);
+
+      // If the asset is found, get the comment count for it.
+      if (asset) {
+        commentCount = await ctx.loaders.Comments.countByAssetID.load(asset.id);
+      }
+    }
+  } catch (err) {
+    // Looks like an error occurred, it's possible that the Asset does not
+    // exist.
+  }
+
+  // Format comment count per WaPo guidelines
+  commentCount = formattedCommentCount(commentCount);
+
+  // Grab the translation framework out of the request.
+  const translate = res.locals.t;
+
+  // Get a version of the commentCountText that we can use on the template.
+  let commentCountText: string;
+  if (disableCommentText) {
+    commentCountText = `${commentCount}`;
+  } else if (commentCount === 1) {
+    commentCountText = `${commentCount} ${translate("comment_singular")}`;
+  } else {
+    commentCountText = `${commentCount} ${translate("comment_plural")}`;
+  }
+
+  // Send back the headers.
+  addJsonHeaders(res, config.COUNT_CACHE_DURATION);
+
+  // Send the json response for comment count
+  return res.json({ totalCommentCount: commentCountText });
+};
+
 export const router = (router: Router) => {
   router.get("/static/embed/count.js", cacheHandler);
+  router.get("/static/embed/count", cacheJsonHandler);
 };
