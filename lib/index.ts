@@ -32,8 +32,8 @@ function addHeaders(res: Response, expiry: number) {
   res.setHeader("Content-Type", "text/javascript");
 }
 
-function formattedCommentCount(count: number) {
-  let shortCount;
+function formattedCommentCount(count: any) {
+  let shortCount = count;
   if (count >= 1000) {
     shortCount = `${(Math.floor(10 * (count / 1000)) / 10).toFixed(1)}k`;
   }
