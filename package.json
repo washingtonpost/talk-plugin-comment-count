@@ -1,8 +1,13 @@
 {
-  "name": "@coralproject/talk-plugin-comment-count",
+  "name": "@washingtonpost/talk-plugin-comment-count",
   "version": "0.0.2-beta",
   "main": "dist/index.js",
   "author": "Wyatt Johnson <wyattjoh@gmail.com>",
+  "contributors": [{
+    "name" : "Erik Reyna",
+    "email" : "erik.reyna@washpost.com",
+    "url" : "https://erikreyna.com/"
+  }],
   "license": "Apache-2.0",
   "scripts": {
     "compile": "gulp",
