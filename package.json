@@ -3,11 +3,13 @@
   "version": "0.0.3-beta",
   "main": "dist/index.js",
   "author": "Wyatt Johnson <wyattjoh@gmail.com>",
-  "contributors": [{
-    "name" : "Erik Reyna",
-    "email" : "erik.reyna@washpost.com",
-    "url" : "https://erikreyna.com/"
-  }],
+  "contributors": [
+    {
+      "name": "Erik Reyna",
+      "email": "erik.reyna@washpost.com",
+      "url": "https://erikreyna.com/"
+    }
+  ],
   "license": "Apache-2.0",
   "scripts": {
     "compile": "gulp",
@@ -31,5 +33,8 @@
   "dependencies": {
     "ms": "^2.1.1",
     "nunjucks": "^3.1.3"
-  }
+  },
+  "description": "This plugin enables a simple little embed that can live alongside any given Talk install",
+  "repository": "https://github.com/washingtonpost/talk-plugin-comment-count.git",
+  "private": false
 }
